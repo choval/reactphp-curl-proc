@@ -1,0 +1,10 @@
+#!/bin/bash
+if [ "$1" == "" ]; then
+  ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests
+else
+  if [ -f "$1" ]; then
+    ./vendor/bin/phpunit --bootstrap vendor/autoload.php $1
+  else
+    ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests/*$1*
+  fi
+fi

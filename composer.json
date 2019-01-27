@@ -1,0 +1,27 @@
+{
+    "name": "choval/reactphp-curl-proc",
+    "description": "Async Curl using React\\ChildProcess",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["curl","reactphp","async"],
+    "authors": [
+        {
+            "name": "Osvaldo Jiang"
+        }
+    ],
+    "support": {
+      "src": "https://github.com/choval/reactphp-curl-proc"
+    },
+    "require": {
+        "react/child-process": "^0.6",
+        "clue/block-react": "^1.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    },
+    "autoload": {
+        "psr-4": {"choval\\React\\": "src/"},
+        "files": [
+        ]
+    }
+}
