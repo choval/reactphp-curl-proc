@@ -36,7 +36,7 @@ final class Curl {
    * Get
    *
    */
-  public function get($uri, array $args=[]) {
+  public function get($uri, array $args=[], array $headers=[]) {
     $uriParts = parse_url($uri);
     $query = [];
     if(isset($uriParts['query'])) {
@@ -223,7 +223,7 @@ final class Curl {
     $headersString = $this->normalizeHeaders($headers);
     $cookies = $this->getCookies($url);
     $cookiesString = $this->normalizeCookies($cookies);
-    $cmd = 'curl '.$cookiesString.' --include --cookie-jar - -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'"';
+    $cmd = 'curl -L '.$cookiesString.' --include --cookie-jar - -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'"';
     $response = new CurlResponse();
     $process = new Process($cmd);
     $process->start( $this->loop );
