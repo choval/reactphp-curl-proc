@@ -118,7 +118,6 @@ final class Curl {
         $normalized[] = $k.(is_null($v) ? '' : ': '.$v);
       }
     }
-    // TODO: UserAgent
     if(empty($normalized)) {
       return '';
     }
@@ -225,6 +224,7 @@ final class Curl {
     $headersString = $this->normalizeHeaders($headers);
     $cookies = $this->getCookies($url);
     $cookiesString = $this->normalizeCookies($cookies);
+    $userAgent = empty($this->userAgent) ? '' : ' -A "'.$this->userAgent.'"'; // TODO: Prevent injection
     $cmd = 'curl -L '.$cookiesString.' --include --cookie-jar - -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'"';
     $response = new CurlResponse();
     $process = new Process($cmd);
