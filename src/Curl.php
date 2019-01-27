@@ -43,7 +43,9 @@ final class Curl {
       parse_str($uriParts['query'], $query);
     }
     $query = array_merge($query, $args);
-    $uriParts['query'] = http_build_query($query);
+    if(!empty($query)) {
+      $uriParts['query'] = http_build_query($query);
+    }
     $uri = static::glue_url($uriParts);
     return $this->request('GET', $uri);
   }
