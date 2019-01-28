@@ -241,7 +241,6 @@ final class Curl {
 
     $userAgent = empty($this->userAgent) ? '' : ' -A "'.$this->userAgent.'"'; // TODO: Prevent injection
     $cmd = 'curl '.$userAgent.' '.$followString.' '.$cookiesString.' --include '.$cookieJarString.' -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'" '.$postString;
-    echo $cmd;
     $response = new CurlResponse();
     $process = new Process($cmd);
     $process->start( $this->loop );
