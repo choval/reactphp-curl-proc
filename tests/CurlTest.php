@@ -5,6 +5,7 @@ use React\EventLoop\Factory;
 use PHPUnit\Framework\TestCase;
 use choval\React\Curl;
 use Clue\React\Block;
+use React\Stream\ThroughStream;
 
 final class CurlTest extends TestCase {
 
@@ -40,6 +41,7 @@ final class CurlTest extends TestCase {
 
 
 
+
   /**
    * @dataProvider dataProvider
    */
@@ -55,6 +57,24 @@ final class CurlTest extends TestCase {
 
 
 
+
+  /**
+   * @dataProvider dataProvider
+   * @depends testPost
+   */
+  public function testPostStream($data) {
+    $uri = 'http://httpbin.org/post';
+    $stream = new ThroughStream;
+    $prom = static::$curl->request('POST', $uri, $stream);
+    $stream->write(http_build_query($data));
+    $stream->end();
+    $result = Block\await( $prom, static::$loop);
+    $body = $result->getBody();
+    $res = json_decode($body, true);
+    $this->assertEquals( $data, $res['form'] );
+  }
+
+   
 
 }
 
