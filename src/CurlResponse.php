@@ -90,7 +90,7 @@ final class CurlResponse {
       if(!$line) {
         continue;
       }
-      if(substr($line,0,1) == '#') {
+      if(substr($line,0,1) == '#' && substr_count($line,"\t") != 7 ) {
         continue;
       }
       list($domain, $tailmatch, $path, $secure, $expires, $name, $value) = explode("\t", $line, 7);

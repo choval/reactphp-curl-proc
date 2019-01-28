@@ -14,8 +14,7 @@ final class Curl {
 
   private $cookies;
   private $userAgent;
-
-
+  private $followRedirects;
 
 
   /**
@@ -222,10 +221,27 @@ final class Curl {
     $hasBody = is_null($body) ? false : true;
     $bodyString = $hasBody?'-d @-':'';
     $headersString = $this->normalizeHeaders($headers);
+
+    $followString = '';
+    $postString = '';
+    $cookieJarString = ' --cookie-jar - ';
+
+    if($this->followRedirects) {
+      $followString = ' -L ';
+      /*
+      // -- There's a bug in curl not passing cookies when following redirects
+      $file = tempnam(sys_get_temp_dir(), 'curl');
+      $cookieJarString = ' --cookie-jar "'.$file.'" ';
+      $postString = ' && cat "'.$file.'" && rm "'.$file.'" ';
+      */
+    }
+
     $cookies = $this->getCookies($url);
     $cookiesString = $this->normalizeCookies($cookies);
+
     $userAgent = empty($this->userAgent) ? '' : ' -A "'.$this->userAgent.'"'; // TODO: Prevent injection
-    $cmd = 'curl -L '.$cookiesString.' --include --cookie-jar - -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'"';
+    $cmd = 'curl '.$userAgent.' '.$followString.' '.$cookiesString.' --include '.$cookieJarString.' -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'" '.$postString;
+    echo $cmd;
     $response = new CurlResponse();
     $process = new Process($cmd);
     $process->start( $this->loop );
@@ -304,6 +320,15 @@ final class Curl {
 
 
 
+  /**
+   *
+   * Follow redirects
+   *
+   */
+  public function setFollowRedirects(bool $follow) {
+    $this->followRedirects = $follow;
+    return $this;
+  }
 
 }
 
