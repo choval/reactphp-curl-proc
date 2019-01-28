@@ -120,7 +120,7 @@ final class Curl {
     if(empty($normalized)) {
       return '';
     }
-    return ' --header '.implode(';', $normalized);
+    return ' --header "'.implode(';', $normalized).'"';
   }
 
 
