@@ -258,7 +258,7 @@ final class Curl {
         $body->on('data', function($chunk) use ($process) {
           $process->stdin->write($chunk);
         });
-        $body->on('exit', function() use ($process) {
+        $body->on('end', function() use ($process) {
           // Needs a double end for stdin
           $process->stdin->end();
           $process->stdin->end();
