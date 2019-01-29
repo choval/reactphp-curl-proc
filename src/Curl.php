@@ -223,6 +223,7 @@ final class Curl {
       throw new \Exception('MODE NOT SUPPORTED');
     }
     $hasBody = is_null($body) ? false : true;
+    $bodyString = '';
     if($hasBody) {
       if(is_array($body)) {
         $bodyString = '';
