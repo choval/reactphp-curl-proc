@@ -16,6 +16,10 @@ final class Curl {
   private $userAgent;
   private $followRedirects;
 
+  private $timeOut = 60;
+  private $since;
+  private $timer;
+
 
   /**
    *
@@ -219,7 +223,16 @@ final class Curl {
       throw new \Exception('MODE NOT SUPPORTED');
     }
     $hasBody = is_null($body) ? false : true;
-    $bodyString = $hasBody?'-d @-':'';
+    if($hasBody) {
+      if(is_array($body)) {
+        $bodyString = '';
+        foreach($body as $k=>$v) {
+          $bodyString .= ' -F "'.$k.'='.$v.'" ';
+        }
+      } else {
+        $bodyString = '-d @-';
+      }
+    }
     $headersString = $this->normalizeHeaders($headers);
 
     $followString = '';
@@ -244,6 +257,7 @@ final class Curl {
     $response = new CurlResponse();
     $process = new Process($cmd);
     $process->start( $this->loop );
+    $this->since = time();
     $process->stdout->on('data', function ($chunk) use ($response) {
       $response->write($chunk);
     });
@@ -251,26 +265,44 @@ final class Curl {
       $response->end();
       $cookies = $response->getCookies();
       $this->setCookies($cookies);
+      if($this->timer) {
+        $this->loop->cancelTimer($this->timer);
+      }
       $defer->resolve($response);
     });
     if($hasBody) {
-      if($body instanceof ReadableStreamInterface) {
-        $body->on('data', function($chunk) use ($process) {
-          $process->stdin->write($chunk);
-        });
-        $body->on('end', function() use ($process) {
-          // Needs a double end for stdin
+      $this->loop->addTimer(1, function() use ($body, $process) {
+        if($body instanceof ReadableStreamInterface) {
+          $body->on('data', function($chunk) use ($process) {
+            $process->stdin->write($chunk);
+          });
+          $body->on('end', function() use ($process) {
+            // Needs a double end for stdin
+            $process->stdin->end();
+            // $process->stdin->end();
+          });
+        } else {
+          // $process->stdin->write($body);
+          $process->stdin->end($body);
           $process->stdin->end();
+          $this->stdInEnd = true;
+        }
+      });
+      $this->timer = $this->loop->addPeriodicTimer(0.1, function($timer) use ($process) {
+        /*
+        if($this->stdInEnd) {
           $process->stdin->end();
-        });
-      } else {
-        $process->stdin->write($body);
-        $process->stdin->end();
-        $process->stdin->end();
-      }
+        }
+        */
+        if(($this->since + $this->timeOut) < time()) {
+          $this->loop->cancelTimer($timer);
+          $process->terminate();
+        }
+      });
     }
     return $defer->promise();
   }
+  private $stdInEnd = false;
 
 
 
