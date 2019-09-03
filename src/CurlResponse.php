@@ -36,8 +36,9 @@ final class CurlResponse {
   public function write(string $chunk) {
     switch($this->step) {
       case 'headers':
+        $chunk = preg_replace('/^HTTP\/1\.1 100 Continue[\r\n]+/i', '', $chunk);
         $this->rawHeaders .= $chunk;
-        $pos = strpos( $this->rawHeaders, "\r\n\r\n" );
+        $pos = strpos( $this->rawHeaders, "\r\n\r\n");
         if($pos) {
           $this->rawBody = substr($this->rawHeaders, $pos);
           $this->rawHeaders = substr($this->rawHeaders, 0, $pos);

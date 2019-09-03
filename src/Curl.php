@@ -62,7 +62,6 @@ final class Curl {
    *
    */
   public function post($uri, $body, array $headers=[]) {
-    // TODO: Body must be a string
     if(is_array($body)) {
       if(preg_match('/content-type:[^;\/]+\/json/i', implode(';',$headers))) {
         $body = json_encode($body);
@@ -71,6 +70,13 @@ final class Curl {
         $body = http_build_query($body);
       }
     }
+    /*
+    if(strlen($body) < 511) {
+      if(is_file($body)) {
+        // TODO: From file
+      }
+    }
+    */
     return $this->request('POST', $uri, $body, $headers);
   }
 
@@ -284,7 +290,7 @@ final class Curl {
           });
         } else {
           // $process->stdin->write($body);
-          $process->stdin->end($body);
+          $process->stdin->write($body);
           $process->stdin->end();
           $this->stdInEnd = true;
         }
