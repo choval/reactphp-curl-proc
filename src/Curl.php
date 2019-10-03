@@ -236,6 +236,7 @@ final class Curl {
         foreach($body as $k=>$v) {
           $bodyString .= ' -F "'.$k.'='.$v.'" ';
         }
+        $body = '';
       } else {
         $bodyString = '-d @-';
       }
