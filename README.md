@@ -1,5 +1,6 @@
-
 ## reactphp-curl-proc
+
+**WARNING: THIS IS NOT PRODUCTION READY**
 
 Async Curl library for ReactPHP.
 This library uses the curl binary of the system.
@@ -11,7 +12,7 @@ This library uses the curl binary of the system.
 ### Installation
 
 ```
-composer require choval/reactphp-curl-proc
+composer require choval/reactphp-curl-proc:dev-master
 ```
 
 ### Usage

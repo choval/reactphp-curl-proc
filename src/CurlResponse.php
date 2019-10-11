@@ -201,6 +201,28 @@ final class CurlResponse {
 
 
 
+
+  /**
+   *
+   * Gets the header code
+   *
+   */
+  public function getCode()
+  {
+      return $this->code;
+  }
+
+
+
+
+  /**
+   *
+   * Gets the status code
+   *
+   */
+  public function getStatusCode()
+  {
+      $parts = explode(' ', $this->code);
+      return (int)end($parts);
+  }
 }
-
-

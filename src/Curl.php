@@ -233,9 +233,30 @@ final class Curl {
     if($hasBody) {
       if(is_array($body)) {
         $bodyString = '';
+        /*
+        $newbody = '';
+        $boundary = '------CurlFormBoundary'.bin2hex(random_bytes(8));
+        $headers['Content-Type'] = 'multipart/form-data; boundary='.$boundary;
+         */
         foreach($body as $k=>$v) {
-          $bodyString .= ' -F "'.$k.'='.$v.'" ';
+            $char = substr($v, 0, 1);
+            $file = substr($v, 1);
+            if($char == '@' && is_file($file)) {
+                $bodyString .= ' --form \''.$k.'='.$v.'\' ';
+            } else {
+                if (strpos($v, '\'')) {
+                    $v = str_replace('\'', '\\\'', $v);
+                }
+                $bodyString .= ' --form \''.$k.'='.$v.'\' ';
+                /*
+                    $newbody .= $boundary."\r\nContent-Disposition: form-data; name=\"$k\"\r\n\r\n$v\r\n";
+                 */
+            }
         }
+        /*
+        $newbody .= $boundary.'--';
+        $body = $newbody;
+         */
         $body = '';
       } else {
         $bodyString = '-d @-';
@@ -263,10 +284,12 @@ final class Curl {
     $userAgent = empty($this->userAgent) ? '' : ' -A "'.$this->userAgent.'"'; // TODO: Prevent injection
     $cmd = 'curl '.$userAgent.' '.$followString.' '.$cookiesString.' --include '.$cookieJarString.' -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'" '.$postString;
     $response = new CurlResponse();
+    var_dump($cmd);
     $process = new Process($cmd);
     $process->start( $this->loop );
     $this->since = time();
     $process->stdout->on('data', function ($chunk) use ($response) {
+        var_dump($chunk);
       $response->write($chunk);
     });
     $process->on('exit', function ($code) use ($response, $defer) {
@@ -279,7 +302,7 @@ final class Curl {
       $defer->resolve($response);
     });
     if($hasBody) {
-      $this->loop->addTimer(1, function() use ($body, $process) {
+      $this->loop->futureTick(function() use ($body, $process) {
         if($body instanceof ReadableStreamInterface) {
           $body->on('data', function($chunk) use ($process) {
             $process->stdin->write($chunk);
@@ -291,6 +314,7 @@ final class Curl {
           });
         } else {
           // $process->stdin->write($body);
+          var_dump($body);
           $process->stdin->write($body);
           $process->stdin->end();
           $this->stdInEnd = true;
