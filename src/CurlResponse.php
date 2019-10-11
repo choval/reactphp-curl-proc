@@ -128,7 +128,9 @@ final class CurlResponse {
       if(!$this->code && substr($header,0,4) == 'HTTP') {
         $this->code = $header;
       } else {
-        list($k,$v) = explode(': ', $header, 2);
+        $parts = explode(': ', $header, 2);
+        $k = $parts[0];
+        $v = $parts[1] ?? true;
         $k = implode('-', array_map('ucfirst', explode('-', $k)));
         if(!isset($this->headers[$k])) {
           $this->headers[$k] = $v;
