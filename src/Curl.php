@@ -284,12 +284,10 @@ final class Curl {
     $userAgent = empty($this->userAgent) ? '' : ' -A "'.$this->userAgent.'"'; // TODO: Prevent injection
     $cmd = 'curl '.$userAgent.' '.$followString.' '.$cookiesString.' --include '.$cookieJarString.' -X '.$mode.' '.$headersString.' '.$bodyString.' "'.$url.'" '.$postString;
     $response = new CurlResponse();
-    var_dump($cmd);
     $process = new Process($cmd);
     $process->start( $this->loop );
     $this->since = time();
     $process->stdout->on('data', function ($chunk) use ($response) {
-        var_dump($chunk);
       $response->write($chunk);
     });
     $process->on('exit', function ($code) use ($response, $defer) {
@@ -314,7 +312,6 @@ final class Curl {
           });
         } else {
           // $process->stdin->write($body);
-          var_dump($body);
           $process->stdin->write($body);
           $process->stdin->end();
           $this->stdInEnd = true;
